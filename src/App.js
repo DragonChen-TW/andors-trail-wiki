@@ -13,19 +13,18 @@ function App() {
     return this.charAt(0).toUpperCase() + this.slice(1);
   }
 
-  const getXmlData=(fileName, thenDo)=>{
+  const getXmlData = (fileName) => {
     const headers = {
       'Content-Type': 'text/xml',
       'Accept': 'text/xml'
     };
-    fetch(''+fileName, {headers})
+    return fetch(''+fileName, {headers})
       .then(response => {
         return response.text();
       })
       .then(str => {
         return str.replace(/<!--.*-->/g,'');
-      })
-      .then(thenDo);
+      });
   }
   const saveTempResources = (str) => {
     var parser = new XMLParser();
@@ -54,7 +53,8 @@ function App() {
         downcounter.tryDo();
       }
     }
-    getXmlData(resource, thenDo)
+    getXmlData(resource)
+      .then(thenDo);
   }
 
   const getGlobalMap =(downcounter) => {
@@ -68,7 +68,8 @@ function App() {
         downcounter.tryDo();
       }
     }
-    getXmlData("/xml/worldmap.xml", thenDo);
+    getXmlData('/xml/worldmap.xml')
+      .then(thenDo);
   }
 
   const getMaps=(temp, thenDo)=>{
@@ -80,18 +81,19 @@ function App() {
     });
   }
   
-  useEffect(()=>{
-    getXmlData('/values/loadresources.xml', saveTempResources);
-  },[])
+  useEffect(() => {
+    getXmlData('/values/loadresources.xml')
+      .then(saveTempResources);
+  }, [])
 
   return (
     <div className="App">
         {/* { data.resources && <Main resources = { data.resources } maps = { data.maps } globalMap = { data.globalMap }/> } */}
-        <Main
-          resources = { data.resources }
-          maps = { data.maps }
-          globalMap = { data.globalMap }
-        />
+      <Main
+        resources = { data.resources }
+        maps = { data.maps }
+        globalMap = { data.globalMap }
+      />
     </div>
   );
 }
