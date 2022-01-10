@@ -49,39 +49,46 @@ function App() {
       
       temp.maps[name] = parseXmlMap(myXml, name);
       downcounter.progress--
-      if (downcounter.progress==0){
-        downcounter.tryDo();
-      }
+      // if (downcounter.progress==0){
+      //   console.profileEnd('TMX run');
+      //   downcounter.tryDo();
+      // }
     }
-    getXmlData(resource)
+    return getXmlData(resource)
       .then(thenDo);
   }
 
-  const getGlobalMap =(downcounter) => {
+  const getGlobalMap = async (downcounter) => {
     const thenDo = (xmlString) => {
       var parser = new XMLParser();
       var myXml = parser.parseFromString(xmlString);
       
       temp.globalMap = parseGlobalMap(myXml);
       downcounter.progress--
-      if (downcounter.progress==0){
-        downcounter.tryDo();
-      }
+      // if (downcounter.progress==0){
+      //   downcounter.tryDo();
+      // }
     }
     getXmlData('/xml/worldmap.xml')
       .then(thenDo);
   }
 
-  const getMaps=(temp, thenDo)=>{
+  const getMaps = async (temp, thenDo)=>{
     var maps = temp.resources.loadresource_maps;
     var downcounter = {progress:maps.length+1, tryDo:()=>thenDo(temp)};
     getGlobalMap(downcounter);
-    maps.forEach((path)=>{
-      getXmlMap(path.replace('@','/')+".tmx", path.replace('@xml/',''), downcounter);
-    });
+    // maps.forEach((path)=>{
+    //   getXmlMap(path.replace('@','/')+".tmx", path.replace('@xml/',''), downcounter);
+    // });
+    await Promise.all(maps.map(path => {
+      return getXmlMap(path.replace('@','/')+".tmx", path.replace('@xml/',''), downcounter)
+    }));
+    downcounter.tryDo();
+    console.profileEnd('TMX run');
   }
   
   useEffect(() => {
+    console.profile('TMX run');
     getXmlData('/values/loadresources.xml')
       .then(saveTempResources);
   }, [])

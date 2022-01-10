@@ -83,6 +83,7 @@ export default class Main extends React.Component {
         await Promise.all(jsonResourcList.map(([loadResource, resourceName]) =>
             this.getJsonResource(loadResource, resourceName, downcounter)
         ));
+        console.profileEnd('JSON');
     }
 
     getJsonResource = async (resource, name, downcounter) => {
@@ -462,6 +463,7 @@ export default class Main extends React.Component {
 
     componentDidUpdate() {
         if (!this.state.items && this.state.loadJson) {
+            console.profile('JSON');
             this.setState({loadJson: false});
             this.getJsonResources(this.props.resources);
         }
